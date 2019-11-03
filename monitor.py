@@ -18,14 +18,24 @@ config = Config()
 config.init("FEED_URL", str, "https://www.xcontest.org/rss/flights/?world/en")
 config.init("HTTP_TIMEOUT", lambda val: ClientTimeout(total=int(val)), ClientTimeout(total=10))  # seconds
 config.init("HTTP_RAISE_FOR_STATUS", bool_like, True)
+
 config.init("WEBHOOK_URL", str, None)
 config.init("WEBHOOK_TEXT_TEMPLATE", str, "<{flight.link}|{flight.title}>")
+
+config.init("TELEGRAM_BOT_TOKEN", str, None)
+config.init("TELEGRAM_URL", str, "https://api.telegram.org/bot{token}/sendMessage")
+config.init("TELEGRAM_CHAT_ID", int, None)
+config.init("TELEGRAM_TEXT_TEMPLATE", str, "{flight.title}\n{flight.link}")
+
 config.init("PILOT_USERNAMES", lambda val: val.split(","), {})
 config.init("SLEEP", int, 10)  # seconds
 config.init("BACKOFF_SLEEP", int, 30)  # seconds
 
 if not config["WEBHOOK_URL"]:
-    logging.warning("Missing WEBHOOK_URL, requests will only be printed to console")
+    logging.warning("Missing WEBHOOK_URL, webhook output turned off.")
+
+if not config["TELEGRAM_BOT_TOKEN"] or not config["TELEGRAM_CHAT_ID"]:
+    logging.warning("Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID, Telegram output turned off.")
 
 
 @dataclass(unsafe_hash=True)
@@ -91,10 +101,29 @@ def parse_feed(feed: str) -> List[Flight]:
 
 
 async def post_webhook(session: ClientSession, webhook_url: str, text: str):
-    if webhook_url:
-        await session.post(webhook_url, json={"text": text})
-    else:
-        logging.info(f"POST: {text}")  # debug only
+    await session.post(webhook_url, json={"text": text})
+
+
+async def post_telegram(session: ClientSession, telegram_url: str, chat_id: int, text: str):
+    await session.post(telegram_url, data={"chat_id": chat_id, "text": text})
+
+
+async def do_output(session, flight):
+    tasks = []
+    if config["WEBHOOK_URL"]:
+        tasks.append(post_webhook(
+            session,
+            config["WEBHOOK_URL"],
+            config["WEBHOOK_TEXT_TEMPLATE"].format(flight=flight)
+        ))
+    if config["TELEGRAM_BOT_TOKEN"] and config["TELEGRAM_CHAT_ID"]:
+        tasks.append(post_telegram(
+            session,
+            config["TELEGRAM_URL"].format(token=config["TELEGRAM_BOT_TOKEN"]),
+            config["TELEGRAM_CHAT_ID"],
+            config["TELEGRAM_TEXT_TEMPLATE"].format(flight=flight)
+        ))
+    await asyncio.gather(*tasks)
 
 
 async def main():
@@ -123,15 +152,11 @@ async def main():
 
             for flight in flights:
                 try:
-                    await post_webhook(
-                        session,
-                        config["WEBHOOK_URL"],
-                        config["WEBHOOK_TEXT_TEMPLATE"].format(flight=flight)
-                    )
+                    await do_output(session, flight)
                     history.track(flight)
-                    logging.info(f"Posted to webhook: {flight}")
+                    logging.info(f"Posted: {flight}")
                 except (ClientError, asyncio.TimeoutError):
-                    logging.exception("Webhook post failed")
+                    logging.exception("Post failed")
                     logging.info(f"Sleeping for {config['BACKOFF_SLEEP']} seconds")
                     await asyncio.sleep(config["BACKOFF_SLEEP"])
                     continue
