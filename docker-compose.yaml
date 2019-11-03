@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+
+  monitor:
+    build: .
+    image: xcontest-rss-monitor:latest
+    volumes:
+      - ./monitor.py:/app/monitor.py
+    environment:
+      APP_WEBHOOK_URL: FILLME
+      APP_PILOT_USERNAMES: FILLME
