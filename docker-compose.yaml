@@ -8,5 +8,4 @@ services:
     volumes:
       - ./monitor.py:/app/monitor.py
     environment:
-      APP_WEBHOOK_URL: FILLME
-      APP_PILOT_USERNAMES: FILLME
+      APP_FEED_URL: FILLME
