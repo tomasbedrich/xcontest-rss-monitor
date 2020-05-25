@@ -1,11 +1,12 @@
-version: '3.7'
+version: "3"
 
 services:
-
-  monitor:
+  telegram-bot:
     build: .
     image: xcontest-rss-monitor:latest
     volumes:
-      - ./monitor.py:/app/monitor.py
+      - .:/app
+      - ./state:/state
     environment:
-      APP_FEED_URL: FILLME
+      APP_XCONTEST_FEED_URL: FILLME
+      APP_TELEGRAM_BOT_TOKEN: FILLME
