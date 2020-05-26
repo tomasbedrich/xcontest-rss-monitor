@@ -187,11 +187,11 @@ async def list_(message: types.Message):
 @dp.message_handler(CommandStart())
 @dp.message_handler(CommandHelp())
 async def help(message: types.Message):
-    await message.answer(dedent("""
-    Watch XContest flights of specified pilots and post them into this chat.
-    `/register <XCONTEST-USERNAME>` - start watching a pilot
-    `/unregister <XCONTEST-USERNAME>` - stop watching a pilot
-    `/list` - list currently watched pilots
+    await message.answer(dedent(r"""
+    Watch XContest flights of specified pilots and post them into this chat\.
+    `/register <XCONTEST-USERNAME>` \- start watching a pilot
+    `/unregister <XCONTEST-USERNAME>` \- stop watching a pilot
+    `/list` \- list currently watched pilots
     """), parse_mode="MarkdownV2")
 
 
