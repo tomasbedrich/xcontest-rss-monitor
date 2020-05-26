@@ -162,6 +162,25 @@ async def unregister(message: types.Message):
         watch_task = None
 
 
+@dp.message_handler(commands=["list"])
+async def list(message: types.Message):
+    chat_id = message.chat.id
+    log.info(f"Listing all pilots for {chat_id=}")
+
+    pilots = set()
+    for pilot, data in state.items():
+        if chat_id in data.chat_ids:
+            pilots.add(pilot)
+    sorted_pilots = sorted(pilots, key=lambda p: p.username)
+
+    await message.answer(
+        "Pilots registered for this chat:\n" +
+        "\n".join(rf"\- [{p.username}]({p.url})" for p in sorted_pilots),
+        parse_mode="MarkdownV2",
+        disable_web_page_preview=True
+    )
+
+
 @dp.message_handler(CommandStart())
 @dp.message_handler(CommandHelp())
 async def help(message: types.Message):
@@ -170,7 +189,7 @@ async def help(message: types.Message):
     Start/stop using:
     `/register <XCONTEST-USERNAME>`
     `/unregister <XCONTEST-USERNAME>`
-    """), parse_mode="markdown")
+    """), parse_mode="MarkdownV2")
 
 
 async def watch():
