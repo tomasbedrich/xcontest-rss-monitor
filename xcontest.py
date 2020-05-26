@@ -60,7 +60,7 @@ class Flight(object):
 async def download_feed(session: ClientSession, pilot_ids: Iterable[int]) -> str:
     if not pilot_ids:
         raise ValueError("Empty 'pilot' filter is not allowed")
-    url = "https://www.xcontest.org/rss/flights/?cpp&pilot=" + "|".join(map(str, pilot_ids))
+    url = "https://www.xcontest.org/rss/flights/?world/en&pilot=" + "|".join(map(str, pilot_ids))
     return await (await session.get(url)).text()
 
 
