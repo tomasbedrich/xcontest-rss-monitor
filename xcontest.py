@@ -20,14 +20,17 @@ class Pilot:
             self.id = _pilot_id_cache[self.username]
             return
 
-        url = "https://www.xcontest.org/world/cs/piloti/detail:" + self.username
-        detail = await (await session.get(url)).text()
+        detail = await (await session.get(self.url)).text()
         match = re.search(r'XContest\.run\("pilot", .*item : (\d+)', detail, re.DOTALL)
         if not match:
             raise ValueError("Cannot find the pilot ID by a username, it probably doesn't exist")
 
         self.id = int(match[1])
         _pilot_id_cache[self.username] = self.id
+
+    @property
+    def url(self):
+        return "https://www.xcontest.org/world/en/pilots/detail:" + self.username
 
     def __eq__(self, other):
         if isinstance(other, Pilot):
