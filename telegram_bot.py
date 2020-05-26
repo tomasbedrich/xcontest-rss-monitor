@@ -171,8 +171,11 @@ async def list(message: types.Message):
     for pilot, data in state.items():
         if chat_id in data.chat_ids:
             pilots.add(pilot)
-    sorted_pilots = sorted(pilots, key=lambda p: p.username)
 
+    if not pilots:
+        return await message.answer("No pilots registered")
+
+    sorted_pilots = sorted(pilots, key=lambda p: p.username)
     await message.answer(
         "Pilots registered for this chat:\n" +
         "\n".join(rf"\- [{p.username}]({p.url})" for p in sorted_pilots),
@@ -185,10 +188,10 @@ async def list(message: types.Message):
 @dp.message_handler(CommandHelp())
 async def help(message: types.Message):
     await message.answer(dedent("""
-    Watche XContest flights for a pilot and post them into this chat.
-    Start/stop using:
-    `/register <XCONTEST-USERNAME>`
-    `/unregister <XCONTEST-USERNAME>`
+    Watch XContest flights of specified pilots and post them into this chat.
+    `/register <XCONTEST-USERNAME>` - start watching a pilot
+    `/unregister <XCONTEST-USERNAME>` - stop watching a pilot
+    `/list` - list currently watched pilots
     """), parse_mode="MarkdownV2")
 
 
