@@ -163,7 +163,7 @@ async def unregister(message: types.Message):
 
 
 @dp.message_handler(commands=["list"])
-async def list(message: types.Message):
+async def list_(message: types.Message):
     chat_id = message.chat.id
     log.info(f"Listing all pilots for {chat_id=}")
 
