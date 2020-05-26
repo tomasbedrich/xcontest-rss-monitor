@@ -8,5 +8,4 @@ services:
       - .:/app
       - ./state:/state
     environment:
-      APP_XCONTEST_FEED_URL: FILLME
       APP_TELEGRAM_BOT_TOKEN: FILLME
