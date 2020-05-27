@@ -49,9 +49,9 @@ class Flight(object):
 
     @property
     def pilot(self):
-        # link = ''https://www.xcontest.org/cesko/prelety/detail:Bull77/19.05.2020/14:32''
-        username = self.link.split("/")[5].split(":")[1]
-        # title = '20.04.19 [28.46 km :: free_flight] Marcin Makuch'
+        # link = "https://www.xcontest.org/world/en/flights/detail:Bull77/21.05.2020/14:56"
+        username = self.link.split("/")[-3].split(":")[1]
+        # title = "20.04.19 [28.46 km :: free_flight] Marcin Makuch"
         return Pilot(username=username)
 
     def __eq__(self, other):
