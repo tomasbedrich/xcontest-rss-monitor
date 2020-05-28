@@ -10,6 +10,7 @@ from typing import Optional, MutableMapping
 from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
 from aiogram.utils import executor
+from aiogram.utils import markdown
 from aiohttp import ClientError, ClientSession
 
 from config import config
@@ -176,9 +177,10 @@ async def list_(message: types.Message):
         return await message.answer("No pilots registered")
 
     sorted_pilots = sorted(pilots, key=lambda p: p.username)
+    # using markdown.link() because it escapes user input
+    pilots_markdown = "\n".join(r"\-" + markdown.link(p.username, p.url) for p in sorted_pilots)
     await message.answer(
-        "Pilots registered for this chat:\n" +
-        "\n".join(rf"\- [{p.username}]({p.url})" for p in sorted_pilots),
+        "Pilots registered for this chat:\n" + pilots_markdown,
         parse_mode="MarkdownV2",
         disable_web_page_preview=True
     )
