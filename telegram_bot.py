@@ -209,7 +209,7 @@ async def watch():
             continue
 
         try:
-            log.info("Downloading a feed")
+            log.info(f"Downloading a feed for {pilot_ids=}")
             feed = await download_feed(session, pilot_ids)
         except (ClientError, asyncio.TimeoutError):
             log.exception("The feed download failed")
@@ -221,13 +221,14 @@ async def watch():
         log.info(f"Parsed {len(flights)} flights")
 
         for flight in flights:
-            if flight.datetime <= state[flight.pilot].latest_flight:
+            pilot_data = state[flight.pilot]
+            if flight.datetime <= pilot_data.latest_flight:
                 continue
             try:
-                for chat_id in state[flight.pilot].chat_ids:
+                for chat_id in pilot_data.chat_ids:
                     await bot.send_message(chat_id, f"{flight.title}\n{flight.link}")
-                state[flight.pilot].latest_flight = flight.datetime
-                log.info(f"Posted {flight}")
+                pilot_data.latest_flight = flight.datetime
+                log.info(f"Posted {flight} to chat_ids={pilot_data.chat_ids}")
             except (ClientError, asyncio.TimeoutError):
                 log.exception("Posting failed")
                 log.info(f"Sleeping for {config['BACKOFF_SLEEP']} seconds")
