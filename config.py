@@ -10,6 +10,7 @@ config.init("HTTP_TIMEOUT", lambda val: ClientTimeout(total=int(val)), ClientTim
 config.init("HTTP_RAISE_FOR_STATUS", bool_like, True)
 
 config.init("STATE", Path, Path("/state/state.json"))
+config.init("LIVENESS", Path, Path("/tmp/liveness"))
 
 config.init("TELEGRAM_BOT_TOKEN", str, None)
 

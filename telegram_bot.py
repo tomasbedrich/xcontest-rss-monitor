@@ -200,8 +200,14 @@ async def help(message: types.Message):
     """), parse_mode="MarkdownV2")
 
 
+def touch_liveness_probe():
+    config["LIVENESS"].touch()
+
+
 async def watch():
     while True:
+        touch_liveness_probe()
+
         pilot_ids = {pilot.id for pilot in state.keys()}
         if not pilot_ids:
             log.info(f"No pilot_ids to fetch, sleeping for {config['SLEEP']} seconds")
