@@ -7,11 +7,13 @@ from dataclasses import dataclass, field
 from textwrap import dedent
 from typing import Optional, MutableMapping
 
+import sentry_sdk
 from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
 from aiogram.utils import executor
 from aiogram.utils.markdown import escape_md
 from aiohttp import ClientError, ClientSession
+from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
 from config import config
 from xcontest import download_feed, parse_feed, Pilot
@@ -19,6 +21,8 @@ from xcontest import download_feed, parse_feed, Pilot
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
 log = logging.getLogger(__name__)
+
+sentry_sdk.init(**config.get_namespace("SENTRY_"), integrations=[AioHttpIntegration()])
 
 bot = Bot(token=config["TELEGRAM_BOT_TOKEN"])
 dp = Dispatcher(bot)

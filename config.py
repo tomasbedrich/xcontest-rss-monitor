@@ -15,3 +15,6 @@ config.init("TELEGRAM_BOT_TOKEN", str, None)
 
 config.init("SLEEP", int, 600)  # seconds
 config.init("BACKOFF_SLEEP", int, 1200)  # seconds
+
+config.init("SENTRY_DSN", str, None)
+config.init("SENTRY_ENVIRONMENT", str, "production")
