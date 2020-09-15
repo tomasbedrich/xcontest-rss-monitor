@@ -18,11 +18,11 @@
     "default": {
         "aiogram": {
             "hashes": [
-                "sha256:3bbe4237b8e11a347bbc47a07c1cf331ceceda2881317e8760d1e330af191dcb",
-                "sha256:6ec9fe9a8fea1db1a3b515afd4d0ff582ccc771ab1be1d6e79fb84c94ee7f822"
+                "sha256:35c6b0998b2a175d718098c26c199a3643c4c33d68f7c97927a5b67239adc490",
+                "sha256:f37dd5906052af1120862f8ec7d23110e724dacc8c111b0ced9ddcdc9ca3ff3f"
             ],
             "index": "pypi",
-            "version": "==2.9.2"
+            "version": "==2.10.1"
         },
         "aiohttp": {
             "hashes": [
