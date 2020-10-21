@@ -7,7 +7,7 @@ name = "pypi"
 aiohttp = "*"
 llconfig = "*"
 aiogram = "==2.*"
-sentry-sdk = "==0.17.*"
+sentry-sdk = "==0.19.*"
 
 [dev-packages]
 pytest = "*"
