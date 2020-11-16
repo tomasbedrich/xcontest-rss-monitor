@@ -9,8 +9,5 @@ llconfig = "*"
 aiogram = "==2.*"
 sentry-sdk = "==0.19.*"
 
-[dev-packages]
-pytest = "*"
-
 [requires]
 python_version = "3.8"

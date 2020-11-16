@@ -1,10 +1,11 @@
-FROM python:3.8
+FROM python:3.9-slim
 
 WORKDIR /app
 
-RUN pip3 install pipenv
+RUN pip3 install --no-cache-dir pipenv
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --deploy --system
+RUN pip3 uninstall -y pipenv
 
 COPY . ./
 
