@@ -7,7 +7,7 @@ name = "pypi"
 aiohttp = "*"
 llconfig = "*"
 aiogram = "==2.*"
-sentry-sdk = "==0.20.*"
+sentry-sdk = "==1.0.*"
 
 [requires]
 python_version = "3.8"
