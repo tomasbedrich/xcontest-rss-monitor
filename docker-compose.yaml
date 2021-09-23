@@ -4,8 +4,9 @@ services:
   telegram-bot:
     build: .
     image: xcontest-rss-monitor:latest
+    restart: always
     volumes:
       - .:/app
       - ./state:/state
-    environment:
-      APP_TELEGRAM_BOT_TOKEN: FILLME
+    env_file:
+      - .env
