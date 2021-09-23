@@ -3,7 +3,7 @@ version: "3"
 services:
   telegram-bot:
     build: .
-    image: xcontest-rss-monitor:latest
+    image: tomasbedrich/xcontest-rss-monitor
     restart: always
     volumes:
       - .:/app
