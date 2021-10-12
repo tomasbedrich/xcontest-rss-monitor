@@ -6,6 +6,8 @@ from llconfig.converters import bool_like
 
 config = Config()
 
+config.init("LOGGING_LEVEL", str, "INFO")
+
 config.init("HTTP_TIMEOUT", lambda val: ClientTimeout(total=int(val)), ClientTimeout(total=10))  # seconds
 config.init("HTTP_RAISE_FOR_STATUS", bool_like, True)
 

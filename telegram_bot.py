@@ -18,7 +18,7 @@ from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 from config import config
 from xcontest import download_feed, parse_feed, Pilot
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+logging.basicConfig(level=config["LOGGING_LEVEL"], format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
 log = logging.getLogger(__name__)
 
