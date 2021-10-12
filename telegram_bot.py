@@ -102,7 +102,7 @@ def save_state():
 
 async def _get_pilot(message: types.Message):
     """Parse a Pilot object with username and ID from a Telegram message."""
-    log.info("Parsing a pilot username from a message")
+    log.debug(f"Parsing a pilot username from {message=}")
     parts = message.text.strip().split(" ")
     if len(parts) != 2:
         raise ValueError("An username cannot be parsed from a message")
@@ -229,9 +229,11 @@ async def watch():
         for flight in flights:
             pilot_data = state[flight.pilot]
             if flight.datetime <= pilot_data.latest_flight:
+                log.debug(f"Skipping {flight} because it is older or equal to latest flight datetime: {pilot_data.latest_flight}")
                 continue
             try:
                 for chat_id in pilot_data.chat_ids:
+                    log.debug(f"About to post {flight} to {chat_id=}")
                     await bot.send_message(chat_id, f"{flight.title}\n{flight.link}")
                 pilot_data.latest_flight = flight.datetime
                 log.info(f"Posted {flight} to chat_ids={pilot_data.chat_ids}")
