@@ -224,9 +224,10 @@ async def watch():
             continue
 
         flights = parse_feed(feed)
+        flights_sorted = sorted(flights, key=lambda f: f.datetime)
         log.info(f"Parsed {len(flights)} flights")
 
-        for flight in flights:
+        for flight in flights_sorted:
             pilot_data = state[flight.pilot]
             if flight.datetime <= pilot_data.latest_flight:
                 log.debug(f"Skipping {flight} because it is older or equal to latest flight datetime: {pilot_data.latest_flight}")
