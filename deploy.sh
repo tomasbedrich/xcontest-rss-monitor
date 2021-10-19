@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
+git pull
 set -x
 docker pull tomasbedrich/xcontest-rss-monitor:latest
 mkdir -p state/
