@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
-git pull
 set -x
+git pull
 docker pull tomasbedrich/xcontest-rss-monitor:latest
 mkdir -p state/
 sudo chown -R ja:ja state/
