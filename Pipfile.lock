@@ -18,11 +18,11 @@
     "default": {
         "aiogram": {
             "hashes": [
-                "sha256:77071300c9535a18eda29afe7196bcafe92d369672b06e3aca36bd0801ea6659",
-                "sha256:9c7c510d6eb4fba965461457b8a98a13167384a882f95a273b209097b069defe"
+                "sha256:50f6084103be95b65467e4139863b109b789690d0e118e3d795fc941313cd456",
+                "sha256:e35525eae3e95f6c8a36d193b9782041af341fdc2d71e76ead70673bb5b9152a"
             ],
             "index": "pypi",
-            "version": "==2.16"
+            "version": "==2.17"
         },
         "aiohttp": {
             "hashes": [
@@ -146,7 +146,7 @@
                 "sha256:1eecaa09422db5be9e29d7fc65664e6c33bd06f9ced7838578ba40d58bdf3721",
                 "sha256:b0b883e8e874edfdece9c28f314e3dd5badf067342e42fb162203335ae61aa2c"
             ],
-            "markers": "python_full_version >= '3.5.0'",
+            "markers": "python_version >= '3.5'",
             "version": "==2.0.9"
         },
         "frozenlist": {
@@ -232,7 +232,7 @@
                 "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff",
                 "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"
             ],
-            "markers": "python_full_version >= '3.5.0'",
+            "markers": "python_version >= '3.5'",
             "version": "==3.3"
         },
         "llconfig": {
