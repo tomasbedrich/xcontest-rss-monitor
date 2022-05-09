@@ -247,8 +247,8 @@ async def watch():
             try:
                 pilot_data = state[flight.pilot]
             except KeyError:
-                # probably pilot changed his/her username
-                new_username = flight.pilot
+                # probably pilot changed his/her username (but fortunately ID remains the same)
+                new_username = flight.pilot.username
                 new_pilot = Pilot(username=new_username)
                 await new_pilot.load_id(session)
                 log.debug(f"Fetched ID for {new_pilot}")
