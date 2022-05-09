@@ -47,6 +47,15 @@ state_backup_task: Optional[Task] = None
 session: Optional[ClientSession] = None
 
 
+def create_task_log_exception(awaitable):
+    async def _log_exception(awaitable):
+        try:
+            return await awaitable
+        except Exception as e:
+            log.exception(e)
+    return asyncio.create_task(_log_exception(awaitable))
+
+
 async def on_startup(dispatcher: Dispatcher):
     global session, state_backup_task, watch_task
     log.info("Opening an HTTP session")
@@ -54,7 +63,7 @@ async def on_startup(dispatcher: Dispatcher):
     load_state()
     if state and not watch_task:
         log.info("Starting a watch task")
-        watch_task = asyncio.create_task(watch())
+        watch_task = create_task_log_exception(watch())
 
 
 async def on_shutdown(dispatcher: Dispatcher):
@@ -143,7 +152,7 @@ async def register(message: types.Message):
     await message.answer("Okay, registered")
     if not watch_task:
         log.info("Starting a watch task")
-        watch_task = asyncio.create_task(watch())
+        watch_task = create_task_log_exception(watch())
 
 
 @dp.message_handler(commands=["unregister"])
