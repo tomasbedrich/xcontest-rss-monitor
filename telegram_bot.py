@@ -100,6 +100,13 @@ def save_state():
         json.dump(res, f)
 
 
+def get_state_item_by_pilot_id(id: int):
+    for pilot, data in state.items():
+        if pilot.id == id:
+            return pilot, data
+    raise ValueError(f"Pilot with id {id} not found in the state")
+
+
 async def _get_pilot(message: types.Message):
     """Parse a Pilot object with username and ID from a Telegram message."""
     log.debug(f"Parsing a pilot username from {message=}")
@@ -228,7 +235,19 @@ async def watch():
         log.info(f"Parsed {len(flights)} flights")
 
         for flight in flights_sorted:
-            pilot_data = state[flight.pilot]
+            try:
+                pilot_data = state[flight.pilot]
+            except KeyError:
+                # probably pilot changed his/her username
+                new_username = flight.pilot
+                new_pilot = Pilot(username=new_username)
+                await new_pilot.load_id(session)
+                log.debug(f"Fetched ID for {new_pilot}")
+                old_pilot, pilot_data = get_state_item_by_pilot_id(new_pilot.id)
+                state[new_pilot] = pilot_data
+                del state[old_pilot]
+                log.debug(f"Pilot renamed from {old_pilot} to {new_pilot}, state updated")
+
             if flight.datetime <= pilot_data.latest_flight:
                 log.debug(f"Skipping {flight} because it is older or equal to latest flight datetime: {pilot_data.latest_flight}")
                 continue
