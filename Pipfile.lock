@@ -136,11 +136,11 @@
         },
         "certifi": {
             "hashes": [
-                "sha256:84c85a9078b11105f04f3036a9482ae10e4621616db313fe045dd24743a0820d",
-                "sha256:fe86415d55e84719d75f8b69414f6438ac3547d2078ab91b67e779ef69378412"
+                "sha256:0d9c601124e5a6ba9712dbc60d9c53c21e34f5f641fe83002317394311bdce14",
+                "sha256:90c1a32f1d68f940488354e36370f6cca89f0f106db09518524c88d6ed83f382"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==2022.6.15"
+            "version": "==2022.9.24"
         },
         "charset-normalizer": {
             "hashes": [
@@ -217,11 +217,11 @@
         },
         "idna": {
             "hashes": [
-                "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff",
-                "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"
+                "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4",
+                "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"
             ],
             "markers": "python_version >= '3.5'",
-            "version": "==3.3"
+            "version": "==3.4"
         },
         "llconfig": {
             "hashes": [
@@ -305,11 +305,11 @@
         },
         "sentry-sdk": {
             "hashes": [
-                "sha256:af0987fc074ada4a166bdc7e9d99d1da7811c6107e4b3416c7052ea1adb77dfc",
-                "sha256:d391204a2a59c54b764cd351c44c67eed17b43d51f4dbe3eba48b83b70c93db9"
+                "sha256:d6c71d2f85710b66822adaa954af7912bab135d6c85febd5b0f3dfd4ab37e181",
+                "sha256:ef925b5338625448645a778428d8f22a3d17de8b28cc8e6fba60b93393ad86fe"
             ],
             "index": "pypi",
-            "version": "==1.9.7"
+            "version": "==1.9.9"
         },
         "urllib3": {
             "hashes": [
