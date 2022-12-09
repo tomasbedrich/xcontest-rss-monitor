@@ -18,11 +18,11 @@
     "default": {
         "aiogram": {
             "hashes": [
-                "sha256:02e4120122af423575d48519cb469d15189f5da00a3237e715d492fe6d798bfd",
-                "sha256:d2c5068cc89fc4012038268e111ca9249f66decce817522ec4d215dd829bc507"
+                "sha256:b1feb596839b78a5e75931398a8118cadd9297a9f26b961d84d09c6e14c1eade",
+                "sha256:baa5b8aaa48ab2df48dc79bf6a5d292e1ea01dd8cc1236b08998b673ba3b9aa6"
             ],
             "index": "pypi",
-            "version": "==2.22.2"
+            "version": "==2.23.1"
         },
         "aiohttp": {
             "hashes": [
@@ -154,7 +154,7 @@
                 "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3",
                 "sha256:4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18"
             ],
-            "index": "pypi",
+            "markers": "python_version >= '3.6'",
             "version": "==2022.12.7"
         },
         "charset-normalizer": {
@@ -260,6 +260,14 @@
             ],
             "index": "pypi",
             "version": "==2.0.1"
+        },
+        "magic-filter": {
+            "hashes": [
+                "sha256:51002312a8972fa514b998b7ff89340c98be3fc499967c1f5f2af98d13baf8d5",
+                "sha256:d0f1ffa5ff1fbe5105fd5f293c79b5d3795f336ea0f6129c636959a687bf422a"
+            ],
+            "markers": "python_version >= '3.7' and python_version < '4.0'",
+            "version": "==1.0.9"
         },
         "multidict": {
             "hashes": [
