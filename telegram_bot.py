@@ -249,6 +249,8 @@ async def watch():
         flights_sorted = sorted(flights, key=lambda f: f.datetime)
         log.info(f"Parsed {len(flights)} flights")
 
+        to_unregister = []
+
         for flight in flights_sorted:
             try:
                 pilot_data = state[flight.pilot]
@@ -272,8 +274,8 @@ async def watch():
                     try:
                         await bot.send_message(chat_id, f"{flight.title}\n{flight.link}")
                     except BotBlocked:
-                        log.debug(f"Bot blocked by user {chat_id=}, executing unregister command")
-                        _unregister(flight.pilot, chat_id)
+                        to_unregister.append((flight.pilot, chat_id))
+                        continue
                 pilot_data.latest_flight = flight.datetime
                 log.info(f"Posted {flight} to chat_ids={pilot_data.chat_ids}")
             except (ClientError, asyncio.TimeoutError):
@@ -281,6 +283,10 @@ async def watch():
                 log.info(f"Sleeping for {config['BACKOFF_SLEEP']} seconds")
                 await asyncio.sleep(config["BACKOFF_SLEEP"])
                 continue
+
+        for pilot, chat_id in to_unregister:
+            log.debug(f"Bot blocked by user {chat_id=}, executing unregister command")
+            _unregister(pilot, chat_id)
 
         save_state()
         log.info(f"Sleeping for {config['SLEEP']} seconds")
