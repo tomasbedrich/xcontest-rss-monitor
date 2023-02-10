@@ -12,6 +12,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
 from aiogram.utils import executor
 from aiogram.utils.markdown import escape_md
+from aiogram.utils.exceptions import BotBlocked
 from aiohttp import ClientError, ClientSession
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
@@ -157,7 +158,6 @@ async def register(message: types.Message):
 
 @dp.message_handler(commands=["unregister"])
 async def unregister(message: types.Message):
-    global watch_task
 
     chat_id = message.chat.id
     try:
@@ -169,13 +169,19 @@ async def unregister(message: types.Message):
     if pilot not in state or chat_id not in state[pilot].chat_ids:
         return await message.answer("Already unregistered for this chat")
 
+    _unregister(pilot, chat_id)
+    message.answer("Okay, unregistered")
+
+
+def _unregister(pilot: Pilot, chat_id: int):
+    global watch_task
+
     state[pilot].chat_ids.remove(chat_id)
     if not state[pilot].chat_ids:
         # need to cleanup keys with empty values
         del state[pilot]
     save_state()
 
-    await message.answer("Okay, unregistered")
     if not state and watch_task:
         log.info("Stopping a watch task")
         # noinspection PyUnresolvedReferences
@@ -263,7 +269,11 @@ async def watch():
             try:
                 for chat_id in pilot_data.chat_ids:
                     log.debug(f"About to post {flight} to {chat_id=}")
-                    await bot.send_message(chat_id, f"{flight.title}\n{flight.link}")
+                    try:
+                        await bot.send_message(chat_id, f"{flight.title}\n{flight.link}")
+                    except BotBlocked:
+                        log.debug(f"Bot blocked by user {chat_id=}, executing unregister command")
+                        _unregister(flight.pilot, chat_id)
                 pilot_data.latest_flight = flight.datetime
                 log.info(f"Posted {flight} to chat_ids={pilot_data.chat_ids}")
             except (ClientError, asyncio.TimeoutError):
