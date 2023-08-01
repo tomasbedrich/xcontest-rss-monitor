@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "53d8fb55435f51ac0a3815da20c0db2e031ed9245d7833cfc723e8bae9271a80"
+            "sha256": "1badf89318be41a2b86afc9e7eea7402d5b2925a80e700ad5f57f606f893ec63"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -154,7 +154,7 @@
                 "sha256:539cc1d13202e33ca466e88b2807e29f4c13049d6d87031a3c110744495cb082",
                 "sha256:92d6037539857d8206b8f6ae472e8b77db8058fec5937a1ef3f54304089edbb9"
             ],
-            "index": "pypi",
+            "markers": "python_version >= '3.6'",
             "version": "==2023.7.22"
         },
         "charset-normalizer": {
@@ -323,11 +323,11 @@
         },
         "magic-filter": {
             "hashes": [
-                "sha256:5c958d55a755baad20d5a3a7094a653a83b854d5a7943bd3358317ff56925670",
-                "sha256:7be1a882d6b87de82a045fb6bd74281dbe83c133a0bf9e04cb91f55c97d8bbaf"
+                "sha256:12737f944a11e84d9feab2b9d6573502772cd5177ae61537bb4e0ee484b54ec8",
+                "sha256:d78e779f812dc14a9ae1b53900548eeb5906d9b3fdc51aec42e3fa0b3131172f"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==1.0.10"
+            "version": "==1.0.11"
         },
         "multidict": {
             "hashes": [
@@ -418,11 +418,11 @@
         },
         "sentry-sdk": {
             "hashes": [
-                "sha256:24308bd05a1f7d65e40acc68a768b4e5c35462039bfd6ae2ca116b92a7b53c78",
-                "sha256:53f36293a0da271a22f476259d2fda76c0b8a1cb96b16d6e6e6aca490d7f3451"
+                "sha256:5053aa7647533b207417cea5f3ee2d5e13aea7001dbb711f46348d7a72597d60",
+                "sha256:78c764cbec1967c41e24967e9a4a5d1e67a7bc960d125d905f94c068a0300ac9"
             ],
             "index": "pypi",
-            "version": "==1.27.1"
+            "version": "==1.29.0"
         },
         "urllib3": {
             "hashes": [
