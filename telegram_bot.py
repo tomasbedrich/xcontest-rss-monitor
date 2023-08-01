@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import html
 import json
 import logging
 from asyncio import Task
@@ -272,7 +273,8 @@ async def watch():
                 for chat_id in pilot_data.chat_ids:
                     log.debug(f"About to post {flight} to {chat_id=}")
                     try:
-                        await bot.send_message(chat_id, f"{flight.title}\n{flight.link}")
+                        flight_title = html.escape(flight.title)
+                        await bot.send_message(chat_id, f'<a href="{flight.link}">{flight_title}</a> [<a href="{flight.pilot.url}">{flight.pilot.username}</a>]', parse_mode="HTML")
                     except BotBlocked:
                         to_unregister.append((flight.pilot, chat_id))
                         continue
