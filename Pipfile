@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 aiohttp = "*"
 llconfig = "*"
-aiogram = "==2.*"
+aiogram = "==3.*"
 sentry-sdk = "==1.39.*"
 
 [requires]
