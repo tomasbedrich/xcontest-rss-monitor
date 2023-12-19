@@ -177,11 +177,15 @@ async def unregister(message: types.Message):
 def _unregister(pilot: Pilot, chat_id: int):
     global watch_task
 
-    state[pilot].chat_ids.remove(chat_id)
-    if not state[pilot].chat_ids:
-        # need to cleanup keys with empty values
-        del state[pilot]
-    save_state()
+    try:
+        state[pilot].chat_ids.remove(chat_id)
+        if not state[pilot].chat_ids:
+            # need to cleanup keys with empty values
+            del state[pilot]
+        save_state()
+    except KeyError:
+        # accidentally unregistered twice
+        pass
 
     if not state and watch_task:
         log.info("Stopping a watch task")
