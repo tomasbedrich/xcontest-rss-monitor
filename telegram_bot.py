@@ -13,7 +13,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
 from aiogram.utils import executor
 from aiogram.utils.markdown import escape_md
-from aiogram.utils.exceptions import BotBlocked, ChatNotFound
+from aiogram.utils.exceptions import BotBlocked, ChatNotFound, UserDeactivated
 from aiohttp import ClientError, ClientSession
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
@@ -275,8 +275,8 @@ async def watch():
                     try:
                         flight_title = html.escape(flight.title)
                         await bot.send_message(chat_id, f'<a href="{flight.link}">{flight_title}</a> [<a href="{flight.pilot.url}">{flight.pilot.username}</a>]', parse_mode="HTML")
-                    except (BotBlocked, ChatNotFound):
-                        to_unregister.append((flight.pilot, chat_id))
+                    except (BotBlocked, ChatNotFound, UserDeactivated) as e:
+                        to_unregister.append((flight.pilot, chat_id, e))
                         continue
                 pilot_data.latest_flight = flight.datetime
                 log.info(f"Posted {flight} to chat_ids={pilot_data.chat_ids}")
@@ -286,8 +286,8 @@ async def watch():
                 await asyncio.sleep(config["BACKOFF_SLEEP"])
                 continue
 
-        for pilot, chat_id in to_unregister:
-            log.debug(f"Unregistering {chat_id=} - bot blocked or chat not found.")
+        for pilot, chat_id, exception in to_unregister:
+            log.debug(f"Unregistering {chat_id=} - reason {exception}.")
             _unregister(pilot, chat_id)
 
         save_state()
