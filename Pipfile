@@ -4,10 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-aiohttp = ">=3.10"
+aiohttp = "*"
 llconfig = "*"
-aiogram = "==3.*"
+aiogram = "==2.*"
 sentry-sdk = "==2.20.*"
 
 [requires]
-python_version = "3.13"
+python_version = "3.8"

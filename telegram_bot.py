@@ -1,23 +1,19 @@
-#!/usr/bin/env python3
-
 import asyncio
 import datetime
 import html
 import json
 import logging
-import re
 from asyncio import Task
 from dataclasses import dataclass, field
 from textwrap import dedent
 from typing import Optional, MutableMapping
 
 import sentry_sdk
-from aiogram import Bot, Dispatcher
-from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode
-from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
-from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram import Bot, Dispatcher, types
+from aiogram.dispatcher.filters import CommandStart, CommandHelp
+from aiogram.utils import executor
+from aiogram.utils.markdown import escape_md
+from aiogram.utils.exceptions import BotBlocked, ChatNotFound, UserDeactivated
 from aiohttp import ClientError, ClientSession
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
@@ -30,8 +26,8 @@ log = logging.getLogger(__name__)
 
 sentry_sdk.init(**config.get_namespace("SENTRY_"), integrations=[AioHttpIntegration()])
 
-bot = Bot(token=config["TELEGRAM_BOT_TOKEN"], default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-dp = Dispatcher()
+bot = Bot(token=config["TELEGRAM_BOT_TOKEN"])
+dp = Dispatcher(bot)
 
 
 @dataclass()
@@ -62,13 +58,7 @@ def create_task_log_exception(awaitable):
     return asyncio.create_task(_log_exception(awaitable))
 
 
-def escape_md(text: str) -> str:
-    """Escape special characters for Telegram MARKDOWN_V2."""
-    return re.sub(r'([_*[\]()~`>#+-=|{}.!])', r'\\\1', text)
-
-
-@dp.startup()
-async def on_startup():
+async def on_startup(dispatcher: Dispatcher):
     global session, state_backup_task, watch_task
     log.info("Opening an HTTP session")
     session = ClientSession(**config.get_namespace("HTTP_"))  # TODO set User-Agent
@@ -78,8 +68,7 @@ async def on_startup():
         watch_task = create_task_log_exception(watch())
 
 
-@dp.shutdown()
-async def on_shutdown():
+async def on_shutdown(dispatcher: Dispatcher):
     log.info("Closing an HTTP session")
     if session:
         await session.close()
@@ -129,7 +118,7 @@ def get_state_item_by_pilot_id(id: int):
     raise ValueError(f"Pilot with id {id} not found in the state")
 
 
-async def _get_pilot(message: Message):
+async def _get_pilot(message: types.Message):
     """Parse a Pilot object with username and ID from a Telegram message."""
     log.debug(f"Parsing a pilot username from {message=}")
     parts = message.text.strip().split(" ")
@@ -143,8 +132,8 @@ async def _get_pilot(message: Message):
     return pilot
 
 
-@dp.message(Command("register"))
-async def register(message: Message):
+@dp.message_handler(commands=["register"])
+async def register(message: types.Message):
     global watch_task
 
     chat_id = message.chat.id
@@ -168,8 +157,8 @@ async def register(message: Message):
         watch_task = create_task_log_exception(watch())
 
 
-@dp.message(Command("unregister"))
-async def unregister(message: Message):
+@dp.message_handler(commands=["unregister"])
+async def unregister(message: types.Message):
 
     chat_id = message.chat.id
     try:
@@ -182,7 +171,7 @@ async def unregister(message: Message):
         return await message.answer("Already unregistered for this chat")
 
     _unregister(pilot, chat_id)
-    await message.answer("Okay, unregistered")
+    message.answer("Okay, unregistered")
 
 
 def _unregister(pilot: Pilot, chat_id: int):
@@ -205,8 +194,8 @@ def _unregister(pilot: Pilot, chat_id: int):
         watch_task = None
 
 
-@dp.message(Command("list"))
-async def list_(message: Message):
+@dp.message_handler(commands=["list"])
+async def list_(message: types.Message):
     chat_id = message.chat.id
     log.info(f"Listing all pilots for {chat_id=}")
 
@@ -222,20 +211,20 @@ async def list_(message: Message):
     pilots_markdown = "\n".join(rf"\- [{escape_md(p.username)}]({p.url})" for p in sorted_pilots)
     await message.answer(
         "Pilots registered for this chat:\n" + pilots_markdown,
-        parse_mode=ParseMode.MARKDOWN_V2,
+        parse_mode="MarkdownV2",
         disable_web_page_preview=True
     )
 
 
-@dp.message(Command("start"))
-@dp.message(Command("help"))
-async def help(message: Message):
+@dp.message_handler(CommandStart())
+@dp.message_handler(CommandHelp())
+async def help(message: types.Message):
     await message.answer(dedent(r"""
     Watch XContest flights of specified pilots and post them into this chat\.
     `/register <XCONTEST-USERNAME>` \- start watching a pilot
     `/unregister <XCONTEST-USERNAME>` \- stop watching a pilot
     `/list` \- list currently watched pilots
-    """), parse_mode=ParseMode.MARKDOWN_V2)
+    """), parse_mode="MarkdownV2")
 
 
 def touch_liveness_probe():
@@ -289,8 +278,8 @@ async def watch():
                     log.debug(f"About to post {flight} to {chat_id=}")
                     try:
                         flight_title = html.escape(flight.title)
-                        await bot.send_message(chat_id, f'<a href="{flight.link}">{flight_title}</a> [<a href="{flight.pilot.url}">{flight.pilot.username}</a>]')
-                    except (TelegramNotFound, TelegramMigrateToChat, TelegramForbiddenError) as e:
+                        await bot.send_message(chat_id, f'<a href="{flight.link}">{flight_title}</a> [<a href="{flight.pilot.url}">{flight.pilot.username}</a>]', parse_mode="HTML")
+                    except (BotBlocked, ChatNotFound, UserDeactivated) as e:
                         to_unregister.append((flight.pilot, chat_id, e))
                         continue
                 pilot_data.latest_flight = flight.datetime
@@ -311,4 +300,4 @@ async def watch():
 
 
 if __name__ == "__main__":
-    dp.run_polling(bot)
+    executor.start_polling(dp, on_startup=on_startup, on_shutdown=on_shutdown)
