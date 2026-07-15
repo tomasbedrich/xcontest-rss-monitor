@@ -21,7 +21,7 @@ class Pilot:
             return
 
         detail = await (await session.get(self.url)).text()
-        match = re.search(r'XContest\.run\("pilot", .*item : (\d+)', detail, re.DOTALL)
+        match = re.search(r'<meta name="pilot-id" content="(\d+)"', detail)
         if not match:
             raise ValueError("Cannot find the pilot ID by a username, it probably doesn't exist")
 
