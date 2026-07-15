@@ -4,15 +4,12 @@ import asyncio
 import datetime
 import json
 import logging
-import re
 from asyncio import Task
 from dataclasses import dataclass, field
-from textwrap import dedent
 from typing import Optional, MutableMapping
 
 import sentry_sdk
 from aiogram import Bot, Dispatcher
-from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramNotFound, TelegramMigrateToChat, TelegramForbiddenError
 from aiogram.filters import Command
 from aiogram.types import Message
