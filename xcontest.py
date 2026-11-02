@@ -1,11 +1,12 @@
+import asyncio
 import datetime
 import re
 from dataclasses import dataclass
 from email.utils import parsedate_to_datetime
-from typing import List, Iterable
+from typing import List, Iterable, Set
 from xml.etree import ElementTree
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientResponseError
 
 _pilot_id_cache = {}
 
@@ -65,6 +66,40 @@ async def download_feed(session: ClientSession, pilot_ids: Iterable[int]) -> str
         raise ValueError("Empty 'pilot' filter is not allowed")
     url = "https://www.xcontest.org/rss/flights/?world/en&pilot=" + "|".join(map(str, pilot_ids))
     return await (await session.get(url)).text()
+
+
+async def find_invalid_pilot_ids(
+    session: ClientSession, pilot_ids: Iterable[int], max_requests: int = 50, delay: float = 2
+) -> Set[int]:
+    """
+    Bisect the pilot IDs (already known to fail as a whole) to find those XContest rejects with HTTP 400.
+
+    Requests are sequential with a delay in between. Returns an empty set if `max_requests` is exhausted,
+    so a server-wide failure cannot cause a request storm or mark every pilot as invalid.
+    """
+    pilot_ids = list(pilot_ids)
+    if len(pilot_ids) == 1:
+        return set(pilot_ids)
+    mid = len(pilot_ids) // 2
+    to_check = [pilot_ids[:mid], pilot_ids[mid:]]
+    invalid = set()
+    for _ in range(max_requests):
+        if not to_check:
+            return invalid
+        ids = to_check.pop()
+        await asyncio.sleep(delay)
+        try:
+            await download_feed(session, ids)
+            continue
+        except ClientResponseError as e:
+            if e.status != 400:
+                raise
+        if len(ids) == 1:
+            invalid.add(ids[0])
+        else:
+            mid = len(ids) // 2
+            to_check += [ids[:mid], ids[mid:]]
+    return set()
 
 
 def parse_feed(feed: str) -> List[Flight]:

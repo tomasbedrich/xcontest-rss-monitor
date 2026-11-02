@@ -13,12 +13,12 @@ from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramNotFound, TelegramMigrateToChat, TelegramForbiddenError
 from aiogram.filters import Command
 from aiogram.types import Message
-from aiohttp import ClientError, ClientSession
+from aiohttp import ClientError, ClientResponseError, ClientSession
 from sentry_sdk.integrations.aiohttp import AioHttpIntegration
 
 from config import config
 from aiogram.utils.formatting import Text, TextLink, Bold, Code
-from xcontest import download_feed, parse_feed, Pilot
+from xcontest import download_feed, find_invalid_pilot_ids, parse_feed, Pilot
 
 logging.basicConfig(level=config["LOGGING_LEVEL"], format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
@@ -243,7 +243,21 @@ async def watch():
 
         try:
             log.info(f"Downloading a feed for {pilot_ids=}")
-            feed = await download_feed(session, pilot_ids)
+            try:
+                feed = await download_feed(session, pilot_ids)
+            except ClientResponseError as e:
+                if e.status != 400:
+                    raise
+                invalid_ids = await find_invalid_pilot_ids(session, pilot_ids)
+                if not invalid_ids or invalid_ids == pilot_ids:
+                    log.warning(f"Cannot determine invalid pilot IDs, got {invalid_ids=}")
+                    raise
+                log.warning(f"Unregistering pilots with invalid {invalid_ids=}")
+                for pilot, data in list(state.items()):
+                    if pilot.id in invalid_ids:
+                        for chat_id in list(data.chat_ids):
+                            _unregister(pilot, chat_id)
+                continue
         except (ClientError, asyncio.TimeoutError):
             log.exception("The feed download failed")
             log.info(f"Sleeping for {config['BACKOFF_SLEEP']} seconds")
