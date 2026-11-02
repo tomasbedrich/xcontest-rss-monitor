@@ -6,7 +6,6 @@ services:
     image: tomasbedrich/xcontest-rss-monitor
     restart: always
     volumes:
-      - .:/app
       - ./state:/state
     env_file:
       - .env
